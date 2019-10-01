@@ -6,17 +6,31 @@ class App extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = { lat: null };
+        this.state = { lat: null, errorMessage: '' };
+
+
+        window.navigator.geolocation.getCurrentPosition(
+            (position) => {
+                // setState is native to our react.component
+                //anytime we want to update State we need to call setState 
+                this.setState({ lat: position.coords.latitude })
+            },
+            (err) => {
+                this.setState({ errorMessage: err.message })
+            }
+        );
     }
 
 
     render() {
-        window.navigator.geolocation.getCurrentPosition(
-            (position) => console.log(position),
-            (err) => console.log(err)
-        );
+        if (this.state.errorMessage && !this.state.lat) {
+            return <div>Error {this.state.errorMessage}</div>
+        }
 
-        return <div>Latitude: </div>
+        if (!this.state.errorMessage && this.state.lat) {
+            return <div>Latitude: {this.state.lat} </div>
+        }
+        return <div>Loading!</div>
     }
 }
 
